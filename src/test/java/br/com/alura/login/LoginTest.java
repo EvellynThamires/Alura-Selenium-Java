@@ -1,11 +1,10 @@
 package br.com.alura.login;
 
+import br.com.alura.lance.BidsPage;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 
 public class LoginTest {
 
@@ -23,28 +22,27 @@ public class LoginTest {
 
     @Test
     public void itShouldLoginWithValidCredentials() {
-        loginPage.login("fulano", "pass");
-        loginPage.submitLoginButton();
+        loginPage.submitLogin("fulano", "pass");
 
-        Assert.assertFalse(loginPage.itIsLoginPage());
-        Assert.assertEquals("fulano", loginPage.getLoggedUsername());
+        String loggedUser = loginPage.getLoggedUser();
+        Assert.assertEquals("fulano", loggedUser);
+        Assert.assertFalse(loginPage.isLoginPage());
     }
 
     @Test
     public void itShouldNotLoginWithInvalidCredentials() {
-        loginPage.login("invalid", "invalid");
-        loginPage.submitLoginButton();
+        loginPage.submitLogin("invalid", "1233");
 
-        Assert.assertTrue(loginPage.itIsNotLoginPage());
-        Assert.assertTrue(loginPage.containsText("Usuário e senha inválidos"));
-        Assert.assertNull(loginPage.getLoggedUsername());
+        Assert.assertNull(loginPage.getLoggedUser());
+        Assert.assertTrue(loginPage.isLoginPage());
+        Assert.assertTrue(loginPage.isInvalidLoginMessageVisible());
     }
 
     @Test
     public void itShouldNotAccessRestrictedPagesWithoutBeingLogged() {
-        loginPage.navigateToBidPage();
+        BidsPage bidsPage = new BidsPage();
 
-        Assert.assertTrue(loginPage.itIsLoginPage());
-        Assert.assertFalse(loginPage.containsText("Dados do leilão"));
+        Assert.assertFalse(bidsPage.isBidsPage());
+        Assert.assertFalse(bidsPage.isAuctionTitleVisible());
     }
 }

@@ -1,39 +1,30 @@
 package br.com.alura.login;
 
+import br.com.alura.PageObject;
+import br.com.alura.leiloes.AuctionPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
-public class LoginPage {
-    private WebDriver browser;
+public class LoginPage extends PageObject {
     private static final String URL_LOGIN = "http://localhost:8080/login";
 
-    //Constructor
     public LoginPage() {
-        System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
-        this.browser = new ChromeDriver();
-        browser.navigate().to(URL_LOGIN);
+        super(null);
+        this.browser.navigate().to(URL_LOGIN);
     }
 
-    public void closeBrowser() {
-        this.browser.quit();
-    }
-
-    public void login(String username, String password) {
+    private void fillInUsernamePassword(String username, String password) {
         browser.findElement(By.id("username")).sendKeys(username);
         browser.findElement(By.id("password")).sendKeys(password);
     }
 
-    public void submitLoginButton() {
+    public AuctionPage submitLogin(String username, String password) {
+        this.fillInUsernamePassword(username, password);
         browser.findElement(By.id("login-form")).submit();
+        return new AuctionPage(browser);
     }
 
-    public boolean itIsLoginPage() {
-        return browser.getCurrentUrl().equals(URL_LOGIN);
-    }
-
-    public Object getLoggedUsername() {
+    public String getLoggedUser() {
         try {
             return browser.findElement(By.id("logged-user")).getText();
         } catch (NoSuchElementException e) {
@@ -41,15 +32,11 @@ public class LoginPage {
         }
     }
 
-    public boolean itIsNotLoginPage() {
-        return browser.getCurrentUrl().equals(URL_LOGIN + "?error");
+    public boolean isLoginPage() {
+        return browser.getCurrentUrl().contains(URL_LOGIN);
     }
 
-    public void navigateToBidPage() {
-        this.browser.navigate().to("http://localhost:8080/leiloes/2");
-    }
-
-    public boolean containsText(String text) {
-        return this.browser.getPageSource().contains(text);
+    public boolean isInvalidLoginMessageVisible() {
+        return browser.getPageSource().contains("Usuário e senha inválidos");
     }
 }
